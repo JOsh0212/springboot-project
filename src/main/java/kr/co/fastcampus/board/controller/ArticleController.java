@@ -18,7 +18,7 @@ public class ArticleController {
     }
     @GetMapping("/{articleId}")
     public String articles(@PathVariable Long articleId, ModelMap modelMap){
-        modelMap.addAttribute("article", null);
+        modelMap.addAttribute("article", "article");    //TODO 구현할 때 실제 데이터 넣기
         modelMap.addAttribute("articleComments", List.of());
         return "articles/detail";
     }
