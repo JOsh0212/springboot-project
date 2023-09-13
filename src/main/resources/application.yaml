@@ -12,6 +12,9 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder : trace
 spring:
   datasource:
+#    url: jdbc:h2:mem:testdb
+#    username: sa
+#    driver-class-name: org.h2.Driver
     url : jdbc:mysql://localhost:3306/board
     username : jsh
     password : qwer1234
@@ -26,9 +29,9 @@ spring:
       hibernate:
         format_sql: true
         default_batch_fetch_size: 100
-  h2:
-    console:
-      enabled: false
+#  h2:
+#    console:
+#      enabled: false
   sql:
     init:
       mode: always
@@ -41,13 +44,13 @@ spring:
 #      detection-strategy: annotated
 
 ---
-
-spring:
-  config:
-    activate:
-      on-profile: testDB
+#
+#spring:
+#  config:
+#    activate:
+#      on-profile: testDB
 #  datasource:
-#    url: jdbc:h2:mem:borad;mode=mysql
+#    url: jdbc:h2:mem:board;mode=mysql
 #    driver-class-name: org.h2.Driver
 #  sql:
 #    init:
