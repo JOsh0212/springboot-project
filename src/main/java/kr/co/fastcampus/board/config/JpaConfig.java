@@ -1,4 +1,4 @@
-package kr.co.fastcampus.board.domain;
+package kr.co.fastcampus.board.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

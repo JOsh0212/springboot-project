@@ -1,7 +1,7 @@
 package kr.co.fastcampus.board.repository;
 
 import kr.co.fastcampus.board.domain.Article;
-import kr.co.fastcampus.board.domain.JpaConfig;
+import kr.co.fastcampus.board.config.JpaConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
