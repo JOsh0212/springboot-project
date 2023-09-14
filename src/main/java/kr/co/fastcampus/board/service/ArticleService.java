@@ -56,7 +56,7 @@ public class ArticleService {
             article.setHashtag(dto.hashtag());
             //따로 save 안해도 됨, 하고 싶으면 save하고 flush해도 됨
         }catch (EntityNotFoundException e){
-            log.warn("게시글 업데이트 실패, 게시글을 찾을 수 없습니다 - dto: {}"+dto);
+            log.warn("게시글 업데이트 실패, 게시글을 찾을 수 없습니다 - dto: {}",dto);
         }
     }
 
