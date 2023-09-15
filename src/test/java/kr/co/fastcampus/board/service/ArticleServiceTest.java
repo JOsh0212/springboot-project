@@ -103,7 +103,7 @@ class ArticleServiceTest {
         given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
 
         // When
-        ArticleWithCommentsDTO dto = sut.getArticle(articleId);
+        ArticleWithCommentsDTO dto = sut.getArticleWithCommnets(articleId);
 
         // Then
         assertThat(dto)
@@ -121,7 +121,7 @@ class ArticleServiceTest {
         given(articleRepository.findById(articleId)).willReturn(Optional.empty());
 
         // When
-        Throwable t = catchThrowable(() -> sut.getArticle(articleId));
+        Throwable t = catchThrowable(() -> sut.getArticleWithCommnets(articleId));
 
         // Then
         assertThat(t)
@@ -153,7 +153,7 @@ class ArticleServiceTest {
         given(articleRepository.getReferenceById(dto.id())).willReturn(article);
 
         // When
-        sut.updateArticle(dto);
+        sut.updateArticle(dto.id(),dto);
 
         // Then
         assertThat(article)
@@ -171,7 +171,7 @@ class ArticleServiceTest {
         given(articleRepository.getReferenceById(dto.id())).willThrow(EntityNotFoundException.class);
 
         // When
-        sut.updateArticle(dto);
+        sut.updateArticle(dto.id(),dto);
 
         // Then
         then(articleRepository).should().getReferenceById(dto.id());
@@ -242,7 +242,6 @@ class ArticleServiceTest {
 
     private UserAccountDTO createUserAccountDto() {
         return UserAccountDTO.of(
-                1L,
                 "uno",
                 "password",
                 "uno@mail.com",

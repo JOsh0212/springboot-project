@@ -25,7 +25,7 @@ public class Article extends AuditingFields{  //게시글
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;    //게시글 아이디
 
-    @Setter @ManyToOne(optional = false) private UserAccount userAccount;   // 유저정보 id
+    @Setter @ManyToOne(optional = false) @JoinColumn(name = "userId") private UserAccount userAccount;   // 유저정보 id
 
 
     @Setter @Column(nullable = false) private String title;   //게시글 제목

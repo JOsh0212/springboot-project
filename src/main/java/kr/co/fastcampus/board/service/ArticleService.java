@@ -35,10 +35,15 @@ public class ArticleService {
             case HASHTAG -> articleRepository.findByHashtag("#"+searchKeyword,pageable).map(ArticleDTO::from);
         };
     }
-
+    public ArticleDTO getArticle(Long articleId) {
+        return articleRepository.findById(articleId)
+                .map(ArticleDTO::from)
+                .orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다 - articleId: " + articleId));
+    }
     @Transactional(readOnly = true)
-    public ArticleWithCommentsDTO getArticle(Long articleId) {
-        return articleRepository.findById(articleId).map(ArticleWithCommentsDTO::from)
+    public ArticleWithCommentsDTO getArticleWithCommnets(Long articleId) {
+        return articleRepository.findById(articleId)
+                .map(ArticleWithCommentsDTO::from)
                 .orElseThrow(()-> new EntityNotFoundException("게시글이 없습니다. - articleId: "+articleId));
     }
 
@@ -46,13 +51,13 @@ public class ArticleService {
         articleRepository.save(dto.toEntity());
     }
 
-    public void updateArticle(ArticleDTO dto) {
+    public void updateArticle(Long articleId,ArticleDTO dto) {
 //        Article article = articleRepository.findById(dto.id()); // 있는지 확인하고 -> 있으면 저장
 //        article.setHashtag("asdfsdfds");
 //        articleRepository.save(article);
 //        Article article = articleRepository.getOne(); // 없어짐 -> ReferenceById로 바뀜
         try{//게시물이 없을 경우를 처리하기 위해
-            Article article = articleRepository.getReferenceById(dto.id()); //getReferenceById에서 EntityNotFoundException을 던짐
+            Article article = articleRepository.getReferenceById(articleId); //getReferenceById에서 EntityNotFoundException을 던짐
             if(dto.title()!=null){article.setTitle(dto.title());}    //record는 알아서 getter, setter를 만들어줌
             if(dto.content()!=null){article.setContent(dto.content());}
             article.setHashtag(dto.hashtag());
@@ -76,4 +81,6 @@ public class ArticleService {
     public List<String> getHashtags() {
         return articleRepository.findAllDistinctHashtags();
     }
+
+
 }

@@ -24,7 +24,7 @@ public class ArticleComment extends AuditingFields{   // 게시글댓글
 
 
     @Setter @ManyToOne(optional = false) private Article article;    //게시글 아이디
-    @Setter @ManyToOne(optional = false) private UserAccount userAccount;   //유저정보 ID
+    @Setter @ManyToOne(optional = false) @JoinColumn(name = "userId") private UserAccount userAccount;   //유저정보 ID
     @Setter @Column(nullable = false, length = 500) private String content; //댓글 내용
 
     //메타데이터 -> 데이터 추출(권장하지 않음)

@@ -38,6 +38,10 @@ public record ArticleDTO(Long id,
         );
     }
 
+    public static ArticleDTO of(UserAccountDTO userAccountDTO, String title, String content, String hashtag) {
+        return new ArticleDTO(null, userAccountDTO, title, content, hashtag, null, null,null,null);
+    }
+
     public Article toEntity() {
         return Article.of(
                 userAccountDTO.toEntity(),
