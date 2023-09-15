@@ -2,6 +2,7 @@ package kr.co.fastcampus.board.dto;
 
 import kr.co.fastcampus.board.domain.Article;
 import kr.co.fastcampus.board.domain.ArticleComment;
+import kr.co.fastcampus.board.domain.UserAccount;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +15,12 @@ public record ArticleCommentDTO(
         String createdBy,
         LocalDateTime modifiedAt,
         String modifiedBy){
+
+    public static ArticleCommentDTO of(Long articleId,
+                                       UserAccountDTO userAccountDTO,
+                                       String content) {
+        return new ArticleCommentDTO(null, articleId, userAccountDTO, content, null, null, null, null);
+    }
     public static ArticleCommentDTO of(Long id,
                                        Long articleId,
                                        UserAccountDTO userAccountDTO,
@@ -36,10 +43,10 @@ public record ArticleCommentDTO(
                 entity.getModifiedBy()
         );
     }
-    public ArticleComment toEntity(Article entity){
+    public ArticleComment toEntity(Article entity, UserAccount userAccount){
         return ArticleComment.of(
                 entity,
-                userAccountDTO.toEntity(),
+                userAccount,
                 content
         );
     }

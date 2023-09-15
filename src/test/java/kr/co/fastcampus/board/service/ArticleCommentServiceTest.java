@@ -8,6 +8,7 @@ import kr.co.fastcampus.board.dto.ArticleCommentDTO;
 import kr.co.fastcampus.board.dto.UserAccountDTO;
 import kr.co.fastcampus.board.repository.ArticleCommentRepository;
 import kr.co.fastcampus.board.repository.ArticleRepository;
+import kr.co.fastcampus.board.repository.UserAccountRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +30,8 @@ class ArticleCommentServiceTest {
     @InjectMocks private ArticleCommentService sut;
     @Mock private ArticleRepository articleRepository;
     @Mock private ArticleCommentRepository articleCommentRepository;
+
+    @Mock private UserAccountRepository userAccountRepository;
 
     @DisplayName("게시글 ID로 조회하면, 해당하는 댓글 리스트를 반환한다.")
     @Test
@@ -52,10 +55,13 @@ class ArticleCommentServiceTest {
         //Given
         ArticleCommentDTO dto = createArticleCommentDTO("댓글");
         given(articleRepository.getReferenceById(dto.articleId())).willReturn(createArticle());
+        given(userAccountRepository.getReferenceById(dto.userAccountDTO().userId())).willReturn(createUserAccount());
+        given(articleCommentRepository.save(any(ArticleComment.class))).willReturn(null);
         //When
         sut.saveArticleComment(dto);
         //Then
         then(articleRepository).should().getReferenceById(dto.articleId());
+        then(userAccountRepository).should().getReferenceById(dto.userAccountDTO().userId());
         then(articleCommentRepository).should().save(any(ArticleComment.class));
     }
     @DisplayName("댓글 저장을 시도 했는데 맞는 게시글이 없으면 경고 로그를 찍고 아무것도 안한다.")
@@ -83,7 +89,7 @@ class ArticleCommentServiceTest {
         sut.updateArticleComment(dto);
 
         //Then
-        assertThat(articleComment.getArticle())
+        assertThat(articleComment.getContent())
                 .isNotEqualTo(oldContent)
                 .isEqualTo(updateContent);
         then(articleCommentRepository).should().getReferenceById(dto.id());
