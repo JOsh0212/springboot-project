@@ -15,7 +15,7 @@ spring:
 #    url: jdbc:h2:mem:testdb
 #    username: sa
 #    driver-class-name: org.h2.Driver
-    url : jdbc:mysql://localhost:3306/board
+    url : jdbc:mysql://localhost:3306/board?characterEncoding=UTF-8&serverTimezone=UTC
     username : jsh
     password : qwer1234
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -29,7 +29,8 @@ spring:
       hibernate:
         format_sql: true
         default_batch_fetch_size: 100
-#  h2:
+
+  #  h2:
 #    console:
 #      enabled: false
   sql:

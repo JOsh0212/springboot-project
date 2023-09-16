@@ -2,10 +2,12 @@ package kr.co.fastcampus.board.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import kr.co.fastcampus.board.domain.Article;
+import kr.co.fastcampus.board.domain.UserAccount;
 import kr.co.fastcampus.board.domain.type.SearchType;
 import kr.co.fastcampus.board.dto.ArticleDTO;
 import kr.co.fastcampus.board.dto.ArticleWithCommentsDTO;
 import kr.co.fastcampus.board.repository.ArticleRepository;
+import kr.co.fastcampus.board.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -21,6 +23,7 @@ import java.util.List;
 @Slf4j
 public class ArticleService {
     private final ArticleRepository articleRepository;
+    private final UserAccountRepository userAccountRepository;
 
     @Transactional(readOnly = true)
     public Page<ArticleDTO> searchArticles(SearchType searchType, String searchKeyword, Pageable pageable) {
@@ -41,6 +44,13 @@ public class ArticleService {
                 .orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다 - articleId: " + articleId));
     }
     @Transactional(readOnly = true)
+    public ArticleWithCommentsDTO getArticleWithComments(Long articleId) {
+        return articleRepository.findById(articleId)
+                .map(ArticleWithCommentsDTO::from)
+                .orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다 - articleId: " + articleId));
+    }
+
+    @Transactional(readOnly = true)
     public ArticleWithCommentsDTO getArticleWithCommnets(Long articleId) {
         return articleRepository.findById(articleId)
                 .map(ArticleWithCommentsDTO::from)
@@ -58,17 +68,21 @@ public class ArticleService {
 //        Article article = articleRepository.getOne(); // 없어짐 -> ReferenceById로 바뀜
         try{//게시물이 없을 경우를 처리하기 위해
             Article article = articleRepository.getReferenceById(articleId); //getReferenceById에서 EntityNotFoundException을 던짐
-            if(dto.title()!=null){article.setTitle(dto.title());}    //record는 알아서 getter, setter를 만들어줌
-            if(dto.content()!=null){article.setContent(dto.content());}
-            article.setHashtag(dto.hashtag());
-            //따로 save 안해도 됨, 하고 싶으면 save하고 flush해도 됨
+            UserAccount userAccount= userAccountRepository.getReferenceById(dto.userAccountDTO().userId());
+            if(article.getUserAccount().equals(userAccount)){
+                if(dto.title()!=null){article.setTitle(dto.title());}    //record는 알아서 getter, setter를 만들어줌
+                if(dto.content()!=null){article.setContent(dto.content());}
+                article.setHashtag(dto.hashtag());
+                //따로 save 안해도 됨, 하고 싶으면 save하고 flush해도 됨
+            }
         }catch (EntityNotFoundException e){
-            log.warn("게시글 업데이트 실패, 게시글을 찾을 수 없습니다 - dto: {}",dto);
+            log.warn("게시글 업데이트 실패, 게시글을 수정하는 데 필요한 정보를 찾을 수 없습니다 - {}",e.getLocalizedMessage());
         }
     }
 
-    public void deleteArticle(long articleId) {
-        articleRepository.deleteById(articleId);
+    public void deleteArticle(long articleId,String userId) {
+
+        articleRepository.deleteByIdAndUserAccount_UserId(articleId,userId);
     }
     @Transactional(readOnly = true)
     public Page<ArticleDTO> searchArticlesViaHashtag(String hashtag, Pageable pageable) {
@@ -81,6 +95,7 @@ public class ArticleService {
     public List<String> getHashtags() {
         return articleRepository.findAllDistinctHashtags();
     }
-
-
+    public long getArticleCount() {
+        return articleRepository.count();
+    }
 }

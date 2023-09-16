@@ -8,6 +8,7 @@ import kr.co.fastcampus.board.dto.ArticleDTO;
 import kr.co.fastcampus.board.dto.ArticleWithCommentsDTO;
 import kr.co.fastcampus.board.dto.UserAccountDTO;
 import kr.co.fastcampus.board.repository.ArticleRepository;
+import kr.co.fastcampus.board.repository.UserAccountRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +34,7 @@ class ArticleServiceTest {
     @InjectMocks private ArticleService sut;
 
     @Mock private ArticleRepository articleRepository;
+    @Mock private UserAccountRepository userAccountRepository;
 
     @DisplayName("검색어 없이 게시글을 검색하면, 게시글 페이지를 반환한다.")
     @Test
@@ -167,28 +169,36 @@ class ArticleServiceTest {
     @Test
     void givenNonexistentArticleInfo_whenUpdatingArticle_thenLogsWarningAndDoesNothing() {
         // Given
+        Article article = createArticle();
         ArticleDTO dto = createArticleDto("새 타이틀", "새 내용", "#springboot");
-        given(articleRepository.getReferenceById(dto.id())).willThrow(EntityNotFoundException.class);
+        given(articleRepository.getReferenceById(dto.id())).willReturn(article);
+        given(userAccountRepository.getReferenceById(dto.userAccountDTO().userId())).willReturn(dto.userAccountDTO().toEntity());
 
         // When
-        sut.updateArticle(dto.id(),dto);
+        sut.updateArticle(dto.id(), dto);
 
         // Then
+        assertThat(article)
+                .hasFieldOrPropertyWithValue("title", dto.title())
+                .hasFieldOrPropertyWithValue("content", dto.content())
+                .hasFieldOrPropertyWithValue("hashtag", dto.hashtag());
         then(articleRepository).should().getReferenceById(dto.id());
+        then(userAccountRepository).should().getReferenceById(dto.userAccountDTO().userId());
     }
 
     @DisplayName("게시글의 ID를 입력하면, 게시글을 삭제한다")
     @Test
     void givenArticleId_whenDeletingArticle_thenDeletesArticle() {
         // Given
+        String userId="uno";
         Long articleId = 1L;
-        willDoNothing().given(articleRepository).deleteById(articleId);
+        willDoNothing().given(articleRepository).deleteByIdAndUserAccount_UserId(articleId,userId);
 
         // When
-        sut.deleteArticle(1L);
+        sut.deleteArticle(1L,userId);
 
         // Then
-        then(articleRepository).should().deleteById(articleId);
+        then(articleRepository).should().deleteByIdAndUserAccount_UserId(articleId,userId);
     }
     @DisplayName("해시태그를 조회하면, 유니크 해시태그 리스트를 반환한다.")
     @Test
@@ -218,9 +228,9 @@ class ArticleServiceTest {
     private Article createArticle() {
         return Article.of(
                 createUserAccount(),
-                "title",
-                "content",
-                "#java"
+                "새 타이틀",
+                "새 내용",
+                "#springboot"
         );
     }
 
