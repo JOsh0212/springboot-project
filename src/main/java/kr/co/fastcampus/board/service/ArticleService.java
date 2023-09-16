@@ -27,22 +27,26 @@ public class ArticleService {
 
     @Transactional(readOnly = true)
     public Page<ArticleDTO> searchArticles(SearchType searchType, String searchKeyword, Pageable pageable) {
-        if(searchKeyword==null||searchKeyword.isBlank()){
+        if (searchKeyword == null || searchKeyword.isBlank()) {
             return articleRepository.findAll(pageable).map(ArticleDTO::from);
         }
-        return switch (searchType){
-            case TITLE -> articleRepository.findByTitleContaining(searchKeyword,pageable).map(ArticleDTO::from);
-            case CONTENT -> articleRepository.findByContentContaining(searchKeyword,pageable).map(ArticleDTO::from);
-            case ID -> articleRepository.findByUserAccount_UserIdContaining(searchKeyword,pageable).map(ArticleDTO::from);
-            case NICKNAME -> articleRepository.findByUserAccount_NicknameContaining(searchKeyword,pageable).map(ArticleDTO::from);
-            case HASHTAG -> articleRepository.findByHashtag("#"+searchKeyword,pageable).map(ArticleDTO::from);
+        return switch (searchType) {
+            case TITLE -> articleRepository.findByTitleContaining(searchKeyword, pageable).map(ArticleDTO::from);
+            case CONTENT -> articleRepository.findByContentContaining(searchKeyword, pageable).map(ArticleDTO::from);
+            case ID ->
+                    articleRepository.findByUserAccount_UserIdContaining(searchKeyword, pageable).map(ArticleDTO::from);
+            case NICKNAME ->
+                    articleRepository.findByUserAccount_NicknameContaining(searchKeyword, pageable).map(ArticleDTO::from);
+            case HASHTAG -> articleRepository.findByHashtag("#" + searchKeyword, pageable).map(ArticleDTO::from);
         };
     }
+
     public ArticleDTO getArticle(Long articleId) {
         return articleRepository.findById(articleId)
                 .map(ArticleDTO::from)
                 .orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다 - articleId: " + articleId));
     }
+
     @Transactional(readOnly = true)
     public ArticleWithCommentsDTO getArticleWithComments(Long articleId) {
         return articleRepository.findById(articleId)
@@ -54,47 +58,53 @@ public class ArticleService {
     public ArticleWithCommentsDTO getArticleWithCommnets(Long articleId) {
         return articleRepository.findById(articleId)
                 .map(ArticleWithCommentsDTO::from)
-                .orElseThrow(()-> new EntityNotFoundException("게시글이 없습니다. - articleId: "+articleId));
+                .orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다. - articleId: " + articleId));
     }
 
     public void saveArticle(ArticleDTO dto) {
         articleRepository.save(dto.toEntity());
     }
 
-    public void updateArticle(Long articleId,ArticleDTO dto) {
+    public void updateArticle(Long articleId, ArticleDTO dto) {
 //        Article article = articleRepository.findById(dto.id()); // 있는지 확인하고 -> 있으면 저장
 //        article.setHashtag("asdfsdfds");
 //        articleRepository.save(article);
 //        Article article = articleRepository.getOne(); // 없어짐 -> ReferenceById로 바뀜
-        try{//게시물이 없을 경우를 처리하기 위해
+        try {//게시물이 없을 경우를 처리하기 위해
             Article article = articleRepository.getReferenceById(articleId); //getReferenceById에서 EntityNotFoundException을 던짐
-            UserAccount userAccount= userAccountRepository.getReferenceById(dto.userAccountDTO().userId());
-            if(article.getUserAccount().equals(userAccount)){
-                if(dto.title()!=null){article.setTitle(dto.title());}    //record는 알아서 getter, setter를 만들어줌
-                if(dto.content()!=null){article.setContent(dto.content());}
+            UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDTO().userId());
+            if (article.getUserAccount().equals(userAccount)) {
+                if (dto.title() != null) {
+                    article.setTitle(dto.title());
+                }    //record는 알아서 getter, setter를 만들어줌
+                if (dto.content() != null) {
+                    article.setContent(dto.content());
+                }
                 article.setHashtag(dto.hashtag());
                 //따로 save 안해도 됨, 하고 싶으면 save하고 flush해도 됨
             }
-        }catch (EntityNotFoundException e){
-            log.warn("게시글 업데이트 실패, 게시글을 수정하는 데 필요한 정보를 찾을 수 없습니다 - {}",e.getLocalizedMessage());
+        } catch (EntityNotFoundException e) {
+            log.warn("게시글 업데이트 실패, 게시글을 수정하는 데 필요한 정보를 찾을 수 없습니다 - {}", e.getLocalizedMessage());
         }
     }
 
-    public void deleteArticle(long articleId,String userId) {
+    public void deleteArticle(long articleId, String userId) {
 
-        articleRepository.deleteByIdAndUserAccount_UserId(articleId,userId);
+        articleRepository.deleteByIdAndUserAccount_UserId(articleId, userId);
     }
+
     @Transactional(readOnly = true)
     public Page<ArticleDTO> searchArticlesViaHashtag(String hashtag, Pageable pageable) {
-        if(hashtag ==null || hashtag.isBlank()){
+        if (hashtag == null || hashtag.isBlank()) {
             return Page.empty(pageable);
         }
-        return articleRepository.findByHashtag(hashtag,pageable).map(ArticleDTO::from);
+        return articleRepository.findByHashtag(hashtag, pageable).map(ArticleDTO::from);
     }
 
     public List<String> getHashtags() {
         return articleRepository.findAllDistinctHashtags();
     }
+
     public long getArticleCount() {
         return articleRepository.count();
     }

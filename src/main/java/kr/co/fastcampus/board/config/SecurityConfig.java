@@ -7,7 +7,6 @@ import kr.co.fastcampus.board.repository.UserAccountRepository;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -51,7 +50,6 @@ public class SecurityConfig {
 //    }
 
     @Bean
-    @Order(3)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
 //                .csrf(csrf -> csrf.ignoringRequestMatchers(toH2Console()))
@@ -69,7 +67,8 @@ public class SecurityConfig {
                 )
                 .formLogin(withDefaults())
                 .logout(logout->logout.logoutSuccessUrl("/"))
-                .build();
+//                .build();
+                .getOrBuild();
     }
 
 //    @Bean
