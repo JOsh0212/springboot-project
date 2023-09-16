@@ -1,6 +1,6 @@
 package kr.co.fastcampus.board.controller;
 
-import kr.co.fastcampus.board.config.SecurityConfig;
+import kr.co.fastcampus.board.config.TestSecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @DisplayName("View 컨트롤러 - 메인")
-@Import(SecurityConfig.class)
+@Import(TestSecurityConfig.class)
 @WebMvcTest(MainController.class)
 class MainControllerTest {
     private final MockMvc mvc;
@@ -21,7 +21,7 @@ class MainControllerTest {
         this.mvc = mvc;
     }
 
-    @DisplayName("[view][GET] 로그인 페이지 - 정상 호출")
+    @DisplayName("[view][GET] 메인 페이지 - 정상 호출")
     @Test
     public void givenNothing_whenRequestingRootPage_thenRedirectsToArticlesPage() throws Exception {    //내가 만든것X, security가 만든것
         mvc.perform(get("/"))
