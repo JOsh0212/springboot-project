@@ -37,15 +37,7 @@ public class Article extends AuditingFields{  //게시글
     @OrderBy("createdAt DESC")  //시간 차순으로
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)    //실무에서는 양방향 바인드를 안씀
     private final Set<ArticleComment> articleComments = new LinkedHashSet<>();
-
-    //메타데이터
-//    @CreatedDate @Column(nullable = false) private LocalDateTime createdAt;    //생성일자
-//    @CreatedBy @Column(nullable = false,length = 100) private String createdBy;   //생성자
-//    @LastModifiedDate @Column(nullable = false) private LocalDateTime modifiedAt;   //수정일자
-//    @LastModifiedBy @Column(nullable = false,length = 100) private String modifiedBy;  //수정자
-
     protected Article() {}
-
     private Article(UserAccount userAccount,String title, String content, String hashtag) {
         this.userAccount = userAccount;
         this.title = title;
@@ -63,18 +55,16 @@ public class Article extends AuditingFields{  //게시글
     public static Article of(UserAccount userAccount, String title, String content) {
         return new Article(userAccount, title, content);
     }
-    //equals and hashcode
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        Article article = (Article) o;
-        if(!(o instanceof  Article article)) return false;  //pattern variable - java14이상
-        return id!=null && id.equals(article.id);   // id가 부여되지 않으면 false && 아이디가 있다면 동등성 검사
+        if(!(o instanceof  Article article)) return false;
+//        return id!=null && id.equals(article.id);
+        return this.getId() !=null && this.getId().equals(article.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(this.getId());
     }
 }
